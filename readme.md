@@ -2,9 +2,9 @@
 > CLI tool for fetching Hoyoverse game account data.
 
 > [!CAUTION]
-> STILL IN DEVELOPMENT, DON'T DOWNLOAD IF YOU WON'T CONTRIBUTE!
+> **STILL IN DEVELOPMENT, DON'T DOWNLOAD IF YOU WON'T CONTRIBUTE!**
 
-**Supported Games**
+### Supported Games
 | Abbr | Game |
 |------|------|
 | `zzz` | Zenless Zone Zero |
@@ -15,20 +15,20 @@
 | `pp` | Petit Planet |
 | `hna` | Honkai: New Anima |
 
-**Build**
+### Build
 ```sh
 make build
 ```
 The binary will be placed at `./hoyofetch`.
 
-**Usage**
+### Usage
 ```sh
 hoyofetch get <game abbr>
 ```
 
-**Config**
+### Config
 Config is stores at `~/.config/konawalls/config.json`.
-**config.json schema**
+#### config.json schema
 ```json
 {
 	"accounts": [
