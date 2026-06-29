@@ -22,18 +22,18 @@ type HoyoClient struct {
 }
 
 type GameRecordCardAchievement struct {
-	Name  string
-	Type  int
-	Value string
+	Name  string `json:"name"`
+	Type  int    `json:"type"`
+	Value string `json:"value"`
 }
 
 type GameRecordCard struct {
-	GameId       int
-	GameRoleId   int
-	Nickname     string
-	Level        int
-	Achievements []GameRecordCardAchievement
-	Region       string // regionname
+	GameId       int                         `json:"game_id"`
+	RoleID       string                      `json:"game_role_id"`
+	Nickname     string                      `json:"nickname"`
+	Level        int                         `json:"level"`
+	Achievements []GameRecordCardAchievement `json:"data"`
+	Region       string                      `json:"region_name"`
 }
 
 func NewHoyoClient(auth AccountAuth) *HoyoClient {

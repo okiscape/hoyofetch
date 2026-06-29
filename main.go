@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"okiscape/hoyofetch/utils"
 )
@@ -39,14 +41,24 @@ Sources: https://github.com/okiscape/hoyofetch`
 }
 
 func runGet(argv []string) {
-	if len(argv) == 0 {
-		fmt.Println("Usage: hoyofetch get [zzz|hsr|gi|hi3rd|tot|hna|pp]")
+	raw := false
+	gameArg := ""
+	for _, a := range argv {
+		if a == "--raw" {
+			raw = true
+		} else if !strings.HasPrefix(a, "-") {
+			gameArg = a
+		}
+	}
+
+	if gameArg == "" {
+		fmt.Println("Usage: hoyofetch get [--raw] [zzz|hsr|gi|hi3rd|tot|hna|pp]")
 		return
 	}
 
-	game, ok := utils.GameAbbrs[argv[0]]
+	game, ok := utils.GameAbbrs[gameArg]
 	if !ok {
-		fmt.Printf("Unknown game: %s\n", argv[0])
+		fmt.Printf("Unknown game: %s\n", gameArg)
 		fmt.Println("Available games: zzz, hsr, gi, tot, hi3rd, pp, hna")
 		return
 	}
@@ -65,40 +77,40 @@ func runGet(argv []string) {
 	acct := cfg.Accounts[0]
 	client := utils.NewHoyoClient(acct.Auth)
 
-	card, err := client.FetchGameRecordCard()
-	if err != nil {
-		fmt.Printf("Failed to get game card: %v\n", err)
+	if raw {
+		cardJSON, err := client.FetchGameRecordCard()
+		if err != nil {
+			fmt.Printf("Fetch error: %v\n", err)
+			return
+		}
+		fmt.Println(string(cardJSON))
 		return
 	}
 
-	role, err := utils.FindGameRole(card, game)
-	if err != nil {
-		fmt.Printf("Game not found on this account: %v\n", err)
-		return
-	}
-
-	fmt.Printf("Account: %s (Lv.%d, %s)\n", role.Nickname, role.Level, role.Region)
-
-	var data []byte
+	var card *utils.GameRecordCard
 	switch game {
 	case utils.GameZZZ:
-		data, err = client.FetchZZZ(role.RoleID, role.Region)
+		card, err = client.FetchZZZ()
 	case utils.GameHSR:
-		data, err = client.FetchHSR(role.RoleID, role.Region)
+		card, err = client.FetchHSR()
 	case utils.GameGI:
-		data, err = client.FetchGI(role.RoleID, role.Region)
+		card, err = client.FetchGI()
 	case utils.GameTOT:
-		data, err = client.FetchTOT(role.RoleID, role.Region)
+		card, err = client.FetchTOT()
 	case utils.GameHI3RD:
-		data, err = client.FetchHI3RD(role.RoleID, role.Region)
-	case utils.GamePP, utils.GameHNA:
-		fmt.Println("Not yet available on Hoyolab API")
-		return
+		card, err = client.FetchHI3RD()
+	case utils.GamePP:
+		card, err = client.FetchPP()
+	case utils.GameHNA:
+		card, err = client.FetchHNA()
 	}
 	if err != nil {
 		fmt.Printf("Fetch error: %v\n", err)
 		return
 	}
 
-	fmt.Println(string(data))
+	fmt.Printf("Account: %s (Lv.%d, %s)\n\n", card.Nickname, card.Level, card.Region)
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	enc.Encode(card)
 }

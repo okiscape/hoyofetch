@@ -31,30 +31,42 @@ func FindGameRole(data []byte, gameID Game) (*GameRecordCard, error) {
 	return nil, fmt.Errorf("game %d not found on this account", gameID)
 }
 
-func (hc *HoyoClient) fetchGameData(roleID, server, gamePath string) ([]byte, error) {
-	return hc.FetchJSON(gamePath, map[string]string{
-		"role_id": roleID,
-		"server":  server,
-	})
+func (hc *HoyoClient) fetchByGame(gameID Game) (*GameRecordCard, error) {
+	card, err := hc.FetchGameRecordCard()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch game card: %w", err)
+	}
+	gamecard, err := FindGameRole(card, gameID)
+	if err != nil {
+		return nil, err
+	}
+	return gamecard, nil
 }
 
-func (hc *HoyoClient) FetchZZZ(roleID, server string) ([]byte, error) {
-	cardfetch := hc.FetchGameRecordCard()
-
+func (hc *HoyoClient) FetchZZZ() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameZZZ)
 }
 
-func (hc *HoyoClient) FetchHSR(roleID, server string) ([]byte, error) {
-	return hc.fetchGameData(roleID, server, "/event/game_record/hkrpg/api/index")
+func (hc *HoyoClient) FetchHSR() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameHSR)
 }
 
-func (hc *HoyoClient) FetchGI(roleID, server string) ([]byte, error) {
-	return hc.fetchGameData(roleID, server, "/event/game_record/genshin/api/index")
+func (hc *HoyoClient) FetchGI() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameGI)
 }
 
-func (hc *HoyoClient) FetchTOT(roleID, server string) ([]byte, error) {
-	return hc.fetchGameData(roleID, server, "/event/game_record/tears_of_themis/api/index")
+func (hc *HoyoClient) FetchTOT() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameTOT)
 }
 
-func (hc *HoyoClient) FetchHI3RD(roleID, server string) ([]byte, error) {
-	return hc.fetchGameData(roleID, server, "/event/game_record/honkai3rd/api/index")
+func (hc *HoyoClient) FetchHI3RD() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameHI3RD)
+}
+
+func (hc *HoyoClient) FetchPP() (*GameRecordCard, error) {
+	return hc.fetchByGame(GamePP)
+}
+
+func (hc *HoyoClient) FetchHNA() (*GameRecordCard, error) {
+	return hc.fetchByGame(GameHNA)
 }
