@@ -24,11 +24,11 @@ hoyofetch get <game abbr>
 ```
 
 ## Config
-Config is stores at `~/.config/konawalls/config.json`.
+Config is stored at `~/.config/hoyofetch/config.json`.
 
 ### How to login?
 To use this tool you have to get your hoyoverse account tokens.\
-To get those you can by logging in at https://www.hoyolab.com/ and read cookies from your browser.\
+To get those, log in at https://www.hoyolab.com/ and read cookies from your browser.\
 *For example: [cookie-editor](https://addons.mozilla.org/en-US/firefox/addon/cookie-editor/) for firefox based browsers or [MILK cookie manager](https://chromewebstore.google.com/detail/milk-—-cookie-manager/haipckejfdppjfblgondaakgckohcihp) for chromium-based.\*
 In cookies after login you need to find `ltuid_v2`, `ltoken_v2`, and `ltmid_v2` and insert them into config.json.\
  
@@ -111,6 +111,6 @@ Here's all available modules and their options:
     <p align="left"><code>{value}</code> - achievement value</p></td>
   </tr>
 </table>
- - `achievements` displaying multiple times for each achievement
+
+ - `achievements` displays multiple times for each achievement
  - Display options available for each module: `lower`, `upper`, `capitalize` and `trim`
-<br>
