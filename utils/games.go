@@ -31,7 +31,7 @@ func FindGameRole(data []byte, gameID Game) (*GameRecordCard, error) {
 	return nil, fmt.Errorf("game %d not found on this account", gameID)
 }
 
-func (hc *HoyoClient) fetchByGame(gameID Game) (*GameRecordCard, error) {
+func (hc *HoyoClient) FetchByGame(gameID Game) (*GameRecordCard, error) {
 	card, err := hc.FetchGameRecordCard()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch game card: %w", err)
@@ -41,32 +41,4 @@ func (hc *HoyoClient) fetchByGame(gameID Game) (*GameRecordCard, error) {
 		return nil, err
 	}
 	return gamecard, nil
-}
-
-func (hc *HoyoClient) FetchZZZ() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameZZZ)
-}
-
-func (hc *HoyoClient) FetchHSR() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameHSR)
-}
-
-func (hc *HoyoClient) FetchGI() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameGI)
-}
-
-func (hc *HoyoClient) FetchTOT() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameTOT)
-}
-
-func (hc *HoyoClient) FetchHI3RD() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameHI3RD)
-}
-
-func (hc *HoyoClient) FetchPP() (*GameRecordCard, error) {
-	return hc.fetchByGame(GamePP)
-}
-
-func (hc *HoyoClient) FetchHNA() (*GameRecordCard, error) {
-	return hc.fetchByGame(GameHNA)
 }

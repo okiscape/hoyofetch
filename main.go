@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -88,29 +87,11 @@ func runGet(argv []string) {
 	}
 
 	var card *utils.GameRecordCard
-	switch game {
-	case utils.GameZZZ:
-		card, err = client.FetchZZZ()
-	case utils.GameHSR:
-		card, err = client.FetchHSR()
-	case utils.GameGI:
-		card, err = client.FetchGI()
-	case utils.GameTOT:
-		card, err = client.FetchTOT()
-	case utils.GameHI3RD:
-		card, err = client.FetchHI3RD()
-	case utils.GamePP:
-		card, err = client.FetchPP()
-	case utils.GameHNA:
-		card, err = client.FetchHNA()
-	}
+	card, err = client.FetchByGame(game)
 	if err != nil {
 		fmt.Printf("Fetch error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("Account: %s (Lv.%d, %s)\n\n", card.Nickname, card.Level, card.Region)
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	enc.Encode(card)
+	utils.ParseModules(cfg.Modules, card)
 }

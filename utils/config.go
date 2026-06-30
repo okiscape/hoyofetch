@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 type AccountConfig struct {
-	Name  string      `json:"name,omitempty"`
-	Auth  AccountAuth `json:"auth"`
-	Games []string    `json:"games,omitempty"`
+	Name string      `json:"name,omitempty"`
+	Auth AccountAuth `json:"auth"`
 }
 
 type AccountAuth struct {
@@ -19,8 +20,15 @@ type AccountAuth struct {
 	LtmidV2  string `json:"ltmid_v2,omitempty"`
 }
 
+type ConfigModule struct {
+	Type        string `json:"type"`
+	Format      string `json:"format"`
+	DisplayArgs string `json:"display"`
+}
+
 type Config struct {
 	Accounts []AccountConfig `json:"accounts"`
+	Modules  []ConfigModule  `json:"modules"`
 }
 
 func getConfigPath() (string, error) {
@@ -49,7 +57,37 @@ func LoadConfig() (*Config, error) {
 						LtokenV2: "",
 						LtmidV2:  "",
 					},
-					Games: []string{"zzz", "gi"},
+				},
+			},
+			Modules: []ConfigModule{
+				{
+					Type:        "game",
+					Format:      "hoyofetch - {}",
+					DisplayArgs: "lower",
+				},
+				{
+					Type:   "username",
+					Format: "  username   {}",
+				},
+				{
+					Type:   "userId",
+					Format: "  user id    {}",
+				},
+				{
+					Type:   "level",
+					Format: "  level      {}",
+				},
+				{
+					Type:   "server",
+					Format: "  server     {}",
+				},
+				{
+					Type:   "text",
+					Format: "  achievements",
+				},
+				{
+					Type:   "achievements",
+					Format: "    {name}: {value}",
 				},
 			},
 		}
@@ -86,4 +124,56 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &cfg, nil
+}
+
+func applyDisplayArgs(s, args string) string {
+	if args == "" {
+		return s
+	}
+	for _, arg := range strings.FieldsFunc(args, func(r rune) bool {
+		return r == ',' || r == ' ' || r == '|'
+	}) {
+		switch strings.ToLower(strings.TrimSpace(arg)) {
+		case "lower":
+			s = strings.ToLower(s)
+		case "upper":
+			s = strings.ToUpper(s)
+		case "capitalize":
+			s = strings.Title(s)
+		case "trim":
+			s = strings.TrimSpace(s)
+		}
+	}
+	return s
+}
+
+func ParseModules(modules []ConfigModule, game *GameRecordCard) {
+	for _, module := range modules {
+		var line string
+		switch module.Type {
+		case "text":
+			line = module.Format
+		case "username":
+			line = strings.ReplaceAll(module.Format, "{}", game.Nickname)
+		case "level":
+			line = strings.ReplaceAll(module.Format, "{}", strconv.Itoa(game.Level))
+		case "achievements":
+			for _, a := range game.Achievements {
+				line := module.Format
+				line = strings.Replace(line, "{name}", a.Name, 1)
+				line = strings.Replace(line, "{value}", a.Value, 1)
+				fmt.Println(applyDisplayArgs(line, module.DisplayArgs))
+			}
+			continue
+		case "server":
+			line = strings.ReplaceAll(module.Format, "{}", game.Region)
+		case "game":
+			line = strings.ReplaceAll(module.Format, "{}", Game(game.GameId).String())
+		case "userId":
+			line = strings.ReplaceAll(module.Format, "{}", game.RoleID)
+		default:
+			continue
+		}
+		fmt.Println(applyDisplayArgs(line, module.DisplayArgs))
+	}
 }
